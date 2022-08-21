@@ -1,0 +1,8 @@
+.vs
+debug
+release
+.qmake*
+Makefile*
+*.pdb
+*.pro.user
+*.vcxproj.*
