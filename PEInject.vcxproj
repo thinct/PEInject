@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{23699BEB-F1BE-3D19-9F0F-C35ADFDA22CC}</ProjectGuid>
+    <ProjectGuid>{2483DB61-BEC5-3CBA-B270-95924BB9C16E}</ProjectGuid>
     <RootNamespace>PEInject</RootNamespace>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
@@ -105,7 +105,7 @@
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <LinkIncremental>false</LinkIncremental>
       <OutputFile>$(OutDir)\PEInject.exe</OutputFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
@@ -159,11 +159,17 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\PEParser.cpp" />
+    <ClCompile Include="Src\PEParserPrivate.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BinaryFile.hpp" />
-    <ClInclude Include="Global.hpp" />
+    <ClInclude Include="Global\BinaryFile.hpp" />
+    <ClInclude Include="Global\Common.hpp" />
+    <ClInclude Include="Tester\FileTest.hpp" />
+    <ClInclude Include="Src\PEParser.h" />
+    <ClInclude Include="Src\PEParserPrivate.h" />
+    <ClInclude Include="Src\PEStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
