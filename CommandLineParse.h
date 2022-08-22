@@ -1,6 +1,8 @@
 #ifndef COMMANDLINEPARSE_H
 #define COMMANDLINEPARSE_H
 
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <iostream>
 #include <QString>
 #include <QDebug>
@@ -75,15 +77,15 @@ public:
 CMD_MODE:
             m_CMD_Mode = CMD_Mode::Interactive;
             std::cout<<">>";
-            std::string input_cmd;
-            std::cin>>input_cmd;
-            QString qStrCmd = input_cmd.data();
+            char input_cmd[4096]{0};
+            std::cin.getline(input_cmd, sizeof(input_cmd)/sizeof(char));
+            QString qStrCmd = input_cmd;
             if (MatchCMD(qStrCmd, QStringList()<<"q"<<"quit"))
             {
                 break;
             }
 
-            m_cmdList = qStrCmd.split(QRegExp(" +"));
+            m_cmdList = MatchSubString("(\".*?\")||(\\S+)", qStrCmd, 2);
         }
     }
 
@@ -119,6 +121,27 @@ private:
     {
         PEParser parser(peFilePath);
         parser.loadImportTable();
+    }
+
+
+    QStringList MatchSubString(QString regexp, QString srcString, int nGroupCount) const
+    {
+        QStringList matchedList;
+        QRegularExpression re(regexp);
+        QRegularExpressionMatchIterator iter = re.globalMatch(srcString);
+        while (iter.hasNext()) 
+        {
+            QRegularExpressionMatch match = iter.next();
+            for (int i = 0; i < nGroupCount; i++)
+            {
+                QString subStr = match.captured(i + 1);
+                if (!subStr.isEmpty())
+                {
+                    matchedList << subStr;
+                }
+            }
+        }
+        return matchedList;
     }
 
 private:
