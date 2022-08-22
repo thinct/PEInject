@@ -24,4 +24,5 @@ HEADERS += \
     Tester/FileTest.hpp \
     Src/PEStruct.h \
     Src/PEParser.h \
-    Src/PEParserPrivate.h
+    Src/PEParserPrivate.h \
+    CommandLineParse.h
