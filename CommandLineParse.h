@@ -59,7 +59,7 @@ public:
                 if (MatchCMD(m_cmdList[0]
                              , QStringList()<<"DisplayImportTable"<<"DIT"))
                 {
-                    LoadImportTable(m_cmdList[1].toStdString());
+                    LoadImportTable(m_cmdList[1].remove("\"").toStdString());
                 }
             }
             else
