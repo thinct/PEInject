@@ -3,17 +3,27 @@
 
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QString>
 #include <iostream>
 #include <set>
-#include <QString>
-#include <QDebug>
 
-#include "Tester/FileTest.hpp"
-#include "Src/PEParser.h"
 #include "ICmder.h"
 
-using namespace PEInjector;
 
+namespace Cmder
+{
+
+static bool MatchCMD(QString cmdSrc, QStringList cmdList)
+{
+    foreach (QString cmdItem, cmdList)
+    {
+        if (0 == cmdItem.compare(cmdSrc, Qt::CaseInsensitive))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 class CommandLineParse
 {
@@ -44,25 +54,6 @@ public:
         return *this;
     }
 
-    CommandLineParse& AddCmder(ICmder* pCmder)
-    {
-        m_CmderSet.insert(pCmder);
-        return *this;
-    }
-
-    CommandLineParse& DeleteCmder(ICmder* pCmder)
-    {
-        for (auto iter = m_CmderSet.begin(); iter != m_CmderSet.end(); iter++)
-        {
-            if (*iter == pCmder)
-            {
-                m_CmderSet.erase(iter);
-                break;
-            }
-        }
-        return *this;
-    }
-
     void exec()
     {
         while (true)
@@ -76,26 +67,19 @@ public:
                 goto CMD_MODE;
             }
 
-            if (1 == cmdCount)
-            {
-                if (MatchCMD(m_cmdList[0], QStringList()<<"detach"))
-                {
 
-                }
-            }
-            else if (2 == cmdCount)
+            bool processedFlag = false;
+            for (auto iter = m_CmderSet.begin(); iter != m_CmderSet.end(); iter++)
             {
-                if (MatchCMD(m_cmdList[0], QStringList()<<"int"))
+                ICmder* pCmder = *iter;
+                ICmder::ErrorCode iRet = pCmder->ChangeEvent(m_cmdList);
+                if (ICmder::ErrorCode::SUCCESS == iRet && !processedFlag)
                 {
-                    CustomINT(m_cmdList[0].toInt());
-                }
-                if (MatchCMD(m_cmdList[0]
-                             , QStringList()<<"DisplayImportTable"<<"DIT"))
-                {
-                    LoadImportTable(m_cmdList[1].remove("\"").toStdString());
+                    processedFlag = true;
                 }
             }
-            else
+
+            if (!processedFlag)
             {
                 std::cout << "Nothing to parse" << std::endl;
                 goto CMD_MODE;
@@ -122,6 +106,25 @@ CMD_MODE:
         }
     }
 
+    CommandLineParse& AddCmder(ICmder* pCmder)
+    {
+        m_CmderSet.insert(pCmder);
+        return *this;
+    }
+
+    CommandLineParse& DeleteCmder(ICmder* pCmder)
+    {
+        for (auto iter = m_CmderSet.begin(); iter != m_CmderSet.end(); iter++)
+        {
+            if (*iter == pCmder)
+            {
+                m_CmderSet.erase(iter);
+                break;
+            }
+        }
+        return *this;
+    }
+
 private:
     CommandLineParse() = default;
 
@@ -135,36 +138,12 @@ private:
         return stringList;
     }
 
-    bool MatchCMD(QString cmdSrc, QStringList cmdList) const
-    {
-        foreach (QString cmdItem, cmdList)
-        {
-            if (0 == cmdItem.compare(cmdSrc, Qt::CaseInsensitive))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void CustomINT(int number)
-    {
-
-    }
-
-    void LoadImportTable(std::string peFilePath)
-    {
-        PEParser parser(peFilePath);
-        parser.loadImportTable();
-    }
-
-
     QStringList MatchSubString(QString regexp, QString srcString, int nGroupCount) const
     {
         QStringList matchedList;
         QRegularExpression re(regexp);
         QRegularExpressionMatchIterator iter = re.globalMatch(srcString);
-        while (iter.hasNext()) 
+        while (iter.hasNext())
         {
             QRegularExpressionMatch match = iter.next();
             for (int i = 0; i < nGroupCount; i++)
@@ -184,5 +163,32 @@ private:
     QStringList       m_cmdList;
     std::set<ICmder*> m_CmderSet;
 };
+
+
+template<typename T>
+class CmderHelper
+{
+public:
+    CmderHelper()
+    {
+        m_pCmder = new T;
+        CommandLineParse::GetInstance()->AddCmder(m_pCmder);
+    }
+    ~CmderHelper()
+    {
+        if (!m_pCmder)
+        {
+            CommandLineParse::GetInstance()->DeleteCmder(m_pCmder);
+        }
+    }
+
+private:
+    ICmder* m_pCmder;
+};
+
+#define REGIST_CMDER_OBJ(_CLASS_) Cmder::CmderHelper<_CLASS_> the##_CLASS_;
+
+
+}
 
 #endif // COMMANDLINEPARSE_H

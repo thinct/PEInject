@@ -1,12 +1,14 @@
 #include <QCoreApplication>
-#include "CommandLineParse.h"
+#include "Cmder/CommandLineParse.hpp"
+#include "Src/CmderParseHeaders.h"
 
 int main(int argc, char *argv[])
 {
     // system("pause");
 
-    CommandLineParse cmdParse(argc, argv);
-    cmdParse.exec();
+    Cmder::CommandLineParse::GetInstance()
+            ->InitMainEntryPointParams(argc, argv)
+            .exec();
 
     return 0;
 }

@@ -16,13 +16,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     Src/PEParser.cpp \
-    Src/PEParserPrivate.cpp
+    Src/PEParserPrivate.cpp \
+    Src/PEParserCmder.cpp
 
 HEADERS += \
     Global/BinaryFile.hpp \
     Global/Common.hpp \
+    Cmder/ICmder.h \
     Tester/FileTest.hpp \
     Src/PEStruct.h \
     Src/PEParser.h \
     Src/PEParserPrivate.h \
-    CommandLineParse.h
+    Src/PEParserCmder.h \
+    Src/CmderParseHeaders.h \
+    Cmder/CommandLineParse.hpp

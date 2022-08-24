@@ -126,15 +126,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Src\PEParser.cpp" />
+    <ClCompile Include="Src\PEParserCmder.cpp" />
     <ClCompile Include="Src\PEParserPrivate.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\BinaryFile.hpp" />
-    <ClInclude Include="CommandLineParse.h" />
+    <ClInclude Include="Src\CmderParseHeaders.h" />
+    <ClInclude Include="Cmder\CommandLineParse.hpp" />
     <ClInclude Include="Global\Common.hpp" />
     <ClInclude Include="Tester\FileTest.hpp" />
+    <ClInclude Include="Cmder\ICmder.h" />
     <ClInclude Include="Src\PEParser.h" />
+    <ClInclude Include="Src\PEParserCmder.h" />
     <ClInclude Include="Src\PEParserPrivate.h" />
     <ClInclude Include="Src\PEStruct.h" />
   </ItemGroup>
