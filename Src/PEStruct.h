@@ -155,6 +155,20 @@ struct DllImport
     std::vector<ImportEntry> entries_;
 };
 
+constexpr const int DirectoryEntryReloc = 5;
+struct ImageBaseReloction
+{
+    std::uint32_t   virtualAddress;
+    std::uint32_t   sizeOfBlock;
+};
+constexpr const int ImageSizeOfBaseReloction = sizeof(ImageBaseReloction);
+struct ImageRelocItem
+{
+    uint32_t rva;
+    uint8_t  type;
+    uint32_t foa;
+};
+
 }
 
 #endif // PESTRUCT_H

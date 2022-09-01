@@ -15,15 +15,31 @@ ICmder::ErrorCode PEParserCmder::ChangeEvent(QStringList cmderList)
         return ErrorCode::FAILED;
     }
 
-    const std::string peFilePath = cmderList[1].remove("\"").toStdString();
-    PEParser parser(peFilePath);
-    parser.loadImportTable();
+    if (MatchCMD(cmderList[0], QStringList()<<"DisplayImportTable"<<"DIT"))
+    {
+        const std::string peFilePath = cmderList[1].remove("\"").toStdString();
+        PrintImportTable(peFilePath);
+    }
+    if (MatchCMD(cmderList[0], QStringList()<<"DisplayRelocTable"<<"DRT"))
+    {
+        const std::string peFilePath = cmderList[1].remove("\"").toStdString();
+        PrintRelocTable(peFilePath);
+    }
 
-    return ErrorCode::SUCCESS;
+    return ErrorCode::FAILED;
 }
 
 bool PEParserCmder::CheckVaild(QStringList cmderList)
 {
-    return (cmderList.count() == 2
-            && MatchCMD(cmderList[0], QStringList()<<"DisplayImportTable"<<"DIT"));
+    return (cmderList.count() == 2);
+}
+
+void PEParserCmder::PrintImportTable(const std::string peFilePath)
+{
+    PEParser(peFilePath).LoadImportTable();
+}
+
+void PEParserCmder::PrintRelocTable(const std::string peFilePath)
+{
+    PEParser(peFilePath).LoadReloctionTable();
 }

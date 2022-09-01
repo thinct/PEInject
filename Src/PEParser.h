@@ -12,8 +12,10 @@ class PEParser
 public:
     PEParser(const std::string& pePath);
 
-    void  readHeadersAndSections(const std::string& pePath);
-    void  loadImportTable();
+    void          ReadHeadersAndSections(const std::string& pePath);
+    void          LoadImportTable();
+    void          LoadReloctionTable();
+    std::uint32_t RvaToFileOffset(std::uint32_t dwRva);
 
 private:
     friend class PEParserPrivate;
