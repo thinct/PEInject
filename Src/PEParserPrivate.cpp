@@ -1,10 +1,12 @@
 #include "PEParserPrivate.h"
+#include <assert.h>
 #include "PEParser.h"
 
 using namespace PEInjector;
 
-PEParserPrivate::PEParserPrivate(PEParser *pPEParser)
+PEParserPrivate::PEParserPrivate(PEParser *pPEParser, const std::string filePath)
     : m_pData(pPEParser)
+    , m_filePath(filePath)
 {
 
 }
@@ -73,4 +75,69 @@ bool PEParserPrivate::checkPESignature()
     }
 
     return true;
+}
+
+uint32_t PEParserPrivate::align(uint32_t ad, uint32_t alignment)
+{
+    return (ad%alignment==0?ad:(ad/alignment+1)*alignment);
+}
+
+std::vector<unsigned char>& PEParserPrivate::section(std::string tagName, bool* ok)
+{
+    if (ok)
+    {
+        *ok = false;
+    }
+
+    int indexFound = -1;
+    for (unsigned int i = 0; i < m_sectionHeaders.size(); i++)
+    {
+        if (m_sectionHeaders[i].name == tagName)
+        {
+            indexFound = i;
+            break;
+        }
+    }
+
+    if (-1 == indexFound)
+    {
+        return std::vector<unsigned char>();
+    }
+
+    assert(m_sectionHeaders.size() == m_sections.size());
+    if (ok)
+    {
+        *ok = true;
+    }
+    return m_sections[indexFound];
+}
+
+SectionHeader& PEInjector::PEParserPrivate::sectionHeader(std::string tagName, bool* ok)
+{
+    if (ok)
+    {
+        *ok = false;
+    }
+
+    int indexFound = -1;
+    unsigned int i = 0;
+    for (; i < m_sectionHeaders.size(); i++)
+    {
+        if (m_sectionHeaders[i].name == tagName)
+        {
+            indexFound = i;
+            break;
+        }
+    }
+
+    if (-1 == indexFound)
+    {
+        return SectionHeader();
+    }
+    if (ok)
+    {
+        *ok = true;
+    }
+    assert(m_sectionHeaders.size() == m_sections.size());
+    return m_sectionHeaders[i];
 }

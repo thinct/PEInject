@@ -11,6 +11,8 @@ protected:
 private:
     void PrintImportTable(const std::string peFilePath);
     void PrintRelocTable(const std::string peFilePath);
+    void AddNewSection(const std::string peFilePath);
+    void SaveAs(const std::string peFilePath);
 };
 
 #endif // PEPARSERCMDER_H
