@@ -1,4 +1,6 @@
 #include "PEParserCmder.h"
+#include <QDir>
+#include <QFileInfo>
 #include "Src/PEParser.h"
 #include "Cmder/CommandLineParse.hpp"
 
@@ -10,11 +12,17 @@ REGIST_CMDER_OBJ(PEParserCmder)
 
 ICmder::ErrorCode PEParserCmder::ChangeEvent(QStringList cmderList)
 {
-    if (!CheckVaild(cmderList))
+    switch (cmderList.count())
     {
-        return ErrorCode::FAILED;
+    case 2:
+        goto LABEL_CASE_2;
+    case 4:
+        goto LABEL_CASE_4;
     }
+    goto CASE_END;
+    
 
+LABEL_CASE_2:
     if (MatchCMD(cmderList[0], QStringList()<<"DisplayImportTable"<<"DIT"))
     {
         const std::string peFilePath = cmderList[1].remove("\"").toStdString();
@@ -33,19 +41,21 @@ ICmder::ErrorCode PEParserCmder::ChangeEvent(QStringList cmderList)
         AddNewSection(peFilePath);
         return ErrorCode::SUCCESS;
     }
-    if (MatchCMD(cmderList[0], QStringList() << "SaveAs"))
+
+LABEL_CASE_4:
+    if (MatchCMD(cmderList[0], QStringList() << "SimpleInject"<<"Inject"))
     {
         const std::string peFilePath = cmderList[1].remove("\"").toStdString();
-        SaveAs(peFilePath);
+        QString addrInjected = cmderList[2];
+        std::uint32_t uAddrInjected = addrInjected.toLower().remove("0x").toUInt();
+        SimpleInject(peFilePath, uAddrInjected, cmderList[3].toUInt());
+        std::cout << "\n=========================================\n\n";
         return ErrorCode::SUCCESS;
     }
 
-    return ErrorCode::FAILED;
-}
 
-bool PEParserCmder::CheckVaild(QStringList cmderList)
-{
-    return (cmderList.count() == 2);
+CASE_END:
+    return ErrorCode::FAILED;
 }
 
 void PEParserCmder::PrintImportTable(const std::string peFilePath)
@@ -63,9 +73,13 @@ void PEParserCmder::AddNewSection(const std::string peFilePath)
     PEParser(peFilePath).ReadHeadersAndSections().AppendNewSection(".newsec", 0x3000, 0);
 }
 
-void PEParserCmder::SaveAs(const std::string peFilePath)
+void PEParserCmder::SimpleInject(const std::string peFilePath, std::uint32_t injectAddr, std::uint16_t instructsLen)
 {
-    // PEParser(peFilePath).ReadHeadersAndSections().SaveAs("E:/1.exe");
+    QFileInfo fileInfo = QFileInfo(peFilePath.data());
+    QString fileDir = fileInfo.absoluteDir().path();
+    QString fileName = fileInfo.baseName() + "-Injected." + fileInfo.suffix();
+    std::string newInjectedFilePath = QString(fileDir + "/" + fileName).toStdString();
+
     PEParser(peFilePath)
         .ReadHeadersAndSections()
         .LoadImportTable()
@@ -73,7 +87,7 @@ void PEParserCmder::SaveAs(const std::string peFilePath)
         .AppendNewSection(".text2", 0x1000, 0x60000020)
         .RebuildImportTable(".rdata2", 0x0)
         .InjectDll("Inject.dll", "INT")
-        .InjectCode(0x123, 5, ".text2", 0x0)
+        .InjectCode(injectAddr, instructsLen, ".text2", 0x0)
         .RebuildRelocTable(".rdata2", 0x5000)
-        .SaveAs("E:/2.exe");
+        .SaveAs(newInjectedFilePath);
 }

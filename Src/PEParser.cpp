@@ -218,9 +218,6 @@ PEParser& PEInjector::PEParser::RebuildImportTable(std::string tagName, std::uin
                 .modifyVectorByteData(entry.hint, fileOffset)
                 .modifyVectorByteData((char*)entry.functionName.data(), entry.functionName.length()+1);
             fileOffset = vectorDataOpr.CurrentPosition()+1;
-
-            std::cout << "- Hint: " << entry.hint << std::endl;
-            std::cout << "  Name: " << entry.functionName << std::endl;
         }
     }
 
@@ -297,7 +294,7 @@ PEParser& PEInjector::PEParser::InjectCode(std::uint32_t rvaHook, std::uint8_t l
 
 PEParser &PEParser::AppendNewSection(std::string tagName, uint32_t size, uint32_t characteristics)
 {
-    std::cout << "Append new section:" << std::endl;
+    std::cout << "Append new section:\t" << tagName << std::endl;
 
     uint32_t space_nt_dos = m_pData->m_peOptHeader.sizeOfHeaders - sizeof(SectionHeader)*m_pData->m_coffHeader.numberSections
             - sizeof(PEOptHeader)- sizeof(COFFHeader) - m_pData->m_dosHeader.pointerToCoffHeader;

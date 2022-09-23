@@ -16,7 +16,6 @@ public:
 
 public:
     virtual ErrorCode ChangeEvent(QStringList cmderList) = 0;
-    virtual bool      CheckVaild(QStringList cmderList) = 0;
 };
 
 }
